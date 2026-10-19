@@ -41,7 +41,7 @@ Claude Code 的一个 mod：在输入框上方显示一条状态带，用来替�
 | ⟳ 缓存命中 94% | 最近一次请求的提示缓存命中率。绿色 ≥80%，黄色 ≥50%，红色 <50% |
 | 累计 88% | 本会话所有请求的累计缓存命中率 |
 
-终端较窄时（状态带不足 96 列）只显示小人、状态、占用、速度和命中率。
+终端较窄时（状态带不足 96 列）只显示小人、状态、占用、速度和命中率。窄屏模式只对终端生效：桌面应用报告的列数和终端算法不同，按同一阈值判断会把内容误藏，所以桌面应用始终显示完整内容。
 
 ## 计算口径
 
@@ -53,17 +53,25 @@ Claude Code 的一个 mod：在输入框上方显示一条状态带，用来替�
 
 - `/token-pulse`：显示或隐藏状态带。
 - 首次模型响应之前不显示。
+- 第一轮结束后显示占用、token 数、速度和命中率；趋势条、▲ 变化量和“均”需要至少两个数据点，从第二轮起出现。
 
 ## 安装
 
-需要 Claude Code 2.1.287 或更高版本。在终端执行：
+需要 Claude Code 2.1.287 或更高版本。在 Claude Code 的输入框里执行：
+
+```
+/plugin install token-pulse --marketplace gKev1n/token-pulse
+```
+
+按提示输入 `y` 添加插件市场，再选择安装范围。也可以在系统终端里执行：
 
 ```bash
-claude plugin marketplace add gKev1n/token-pulse
-claude plugin install token-pulse@token-pulse
+claude plugin install token-pulse --marketplace gKev1n/token-pulse
 ```
 
 已在运行的会话里执行 `/reload-plugins` 生效。
+
+如果装着 token-weather，请先停用或卸载，否则两条状态带会同时出现。
 
 想自己改代码的话，把仓库克隆到本机，改为添加本地文件夹：
 
@@ -75,12 +83,20 @@ claude plugin install token-pulse@token-pulse
 
 之后修改这个文件夹里的文件，执行 `/reload-plugins` 即可生效，无需重装。
 
+## 已知问题
+
+- Windows 终端使用中文字体时，`•` 等字符可能显示成两格宽，颜文字会轻微错位。
+
 ## 开发
 
 ```bash
 claude plugin validate .
 claude plugin test .
 ```
+
+- 判断绘制界面要看 `e.surface !== 'terminal'`。终端的元素表里也有 `Svg` 键，只用 `'Svg' in els` 判断会在终端里误画 SVG。
+- 测试里的 `ui.render` 需要测试自己在最底层答一个（见测试文件里的 `engineDraws`）；`session.usage` 的底层答复要包成 `{ value: ... }`。
+- `docs/images/mascot-*.svg` 由 `hooks/icon.ts` 的 `mascotSvg()` 导出。改了小人造型后，需要重新导出这几张图。
 
 ## 许可证
 
