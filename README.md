@@ -1,5 +1,7 @@
 # token-pulse
 
+中文 | [English](README.en.md)
+
 Claude Code 的一个 mod：在输入框上方显示一条状态带，用来替代 token-weather。
 
 ```
