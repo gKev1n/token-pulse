@@ -1,0 +1,3 @@
+# 本地生成的类型定义（tsconfig 引用，由 Claude Code 生成）
+.claude-plugin/types/
+node_modules/

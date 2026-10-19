@@ -1,0 +1,9 @@
+{
+  "name": "token-pulse",
+  "version": "0.2.0",
+  "description": "输入框上方的状态带：精力值小人、上下文用量与趋势、模型输出速度（tok/s）、提示缓存命中率",
+  "author": { "name": "Ge" },
+  "license": "Apache-2.0",
+  "repository": "https://github.com/gKev1n/token-pulse",
+  "types": "./types/index.d.ts"
+}
