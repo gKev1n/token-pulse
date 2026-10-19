@@ -1,7 +1,7 @@
 {
   "name": "token-pulse",
-  "version": "0.2.0",
-  "description": "输入框上方的状态带：精力值小人、上下文用量与趋势、模型输出速度（tok/s）、提示缓存命中率",
+  "version": "0.2.1",
+  "description": "A status band above the prompt: an energy mascot for context usage, usage trend, model output speed (tok/s) and prompt cache hit rate",
   "author": { "name": "Ge" },
   "license": "Apache-2.0",
   "homepage": "https://github.com/gKev1n/token-pulse#readme",

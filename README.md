@@ -1,81 +1,83 @@
 # token-pulse
 
-中文 | [English](README.en.md)
+[中文](README.zh-CN.md) | English
 
-Claude Code 的一个 mod：在输入框上方显示一条状态带，用来替代 token-weather。
+A Claude Code mod that adds a status band above the prompt: context usage with an energy mascot, model output speed, and prompt cache hit rate. It replaces token-weather.
 
 ```
 (-_-) Tired 67%  134.4k/200k ▃▅█ ▲ +98.4k  │  ⇢ 68 tok/s · 均 72  │  ⟳ 缓存命中 94% · 累计 88%
 ```
 
-### 桌面应用（Code 标签页）
+The band's labels are in Chinese: 均 = average, 缓存命中 = cache hit, 累计 = cumulative.
 
-![token-pulse 在 Claude 桌面应用中的效果](docs/images/desktop.png)
+### Desktop app (Code tab)
 
-### 终端（CLI）
+![token-pulse in the Claude desktop app](docs/images/desktop.png)
 
-![token-pulse 在 Claude Code 终端中的效果](docs/images/cli.png)
+### Terminal (CLI)
 
-## 精力值小人
+![token-pulse in the Claude Code terminal](docs/images/cli.png)
 
-上下文越满，小人越累；压缩上下文就是让它睡一觉。桌面应用（Code 标签页）里画成 SVG 小人，终端画不了图，显示为颜文字。
+## The energy mascot
 
-| 上下文占用 | 状态 | 桌面应用 | 终端 | 颜色 |
+The fuller the context, the more tired the mascot gets; compacting the context lets it sleep. The desktop app (Code tab) draws it as an SVG; the terminal cannot draw images, so it shows a kaomoji instead.
+
+| Context used | State | Desktop app | Terminal | Color |
 |---|---|---|---|---|
-| < 25% | Fresh | <img src="docs/images/mascot-fresh.svg" width="42" alt="Fresh"> 眯眼大笑、脸红 | `(^‿^)` | 绿 |
-| 25–50% | Focused | <img src="docs/images/mascot-focused.svg" width="42" alt="Focused"> 圆眼、浅笑 | `(•_•)` | 青 |
-| 50–75% | Tired | <img src="docs/images/mascot-tired.svg" width="42" alt="Tired"> 眼睛眯成线、打哈欠 | `(-_-)` | 橙 |
-| 75–90% | Drained | <img src="docs/images/mascot-drained.svg" width="42" alt="Drained"> 下垂眼、波浪嘴、冒汗 | `(=_=;)` | 珊瑚 |
-| ≥ 90% | Exhausted | <img src="docs/images/mascot-asleep.svg" width="42" alt="Exhausted"> 睡着了，头顶 zZ | `(-_-)zZ` | 红，快压缩了 |
+| < 25% | Fresh | ![Fresh](docs/images/mascot-fresh.svg) laughing, rosy cheeks | `(^‿^)` | green |
+| 25–50% | Focused | ![Focused](docs/images/mascot-focused.svg) round eyes, slight smile | `(•_•)` | teal |
+| 50–75% | Tired | ![Tired](docs/images/mascot-tired.svg) slit eyes, yawning | `(-_-)` | orange |
+| 75–90% | Drained | ![Drained](docs/images/mascot-drained.svg) drooping eyes, wavy mouth, sweat drop | `(=_=;)` | coral |
+| ≥ 90% | Exhausted | ![Exhausted](docs/images/mascot-asleep.svg) asleep, zZ overhead | `(-_-)zZ` | red, compaction is near |
 
-状态文字（Fresh、Tired 等）和趋势条也会用同一档颜色。
+The state word (Fresh, Tired, …) and the trend bar use the same color.
 
-## 各项含义
+## What each item means
 
-| 项目 | 含义 |
+| Item | Meaning |
 |---|---|
-| 67% | 当前上下文窗口占用 |
-| 134.4k/200k | 已用 token 数 / 窗口大小 |
-| ▃▅█ | 最近 12 轮结束时的上下文占用趋势 |
-| ▲ +98.4k | 与上一轮相比上下文增减的 token 数 |
-| ⇢ 68 tok/s | 最近一次模型请求的输出速度 |
-| 均 72 | 最近 10 次有效请求的平均输出速度（按 token 加权） |
-| ⟳ 缓存命中 94% | 最近一次请求的提示缓存命中率。绿色 ≥80%，黄色 ≥50%，红色 <50% |
-| 累计 88% | 本会话所有请求的累计缓存命中率 |
+| 67% | Share of the context window in use |
+| 134.4k/200k | Tokens used / window size |
+| ▃▅█ | Context usage at the end of each of the last 12 turns |
+| ▲ +98.4k | Change in context tokens since the previous turn |
+| ⇢ 68 tok/s | Output speed of the latest model request |
+| 均 72 | Average output speed over the last 10 valid requests, weighted by tokens |
+| ⟳ 缓存命中 94% | Prompt cache hit rate of the latest request: green ≥ 80%, yellow ≥ 50%, red < 50% |
+| 累计 88% | Cumulative cache hit rate over all requests in this session |
 
-终端较窄时（状态带不足 96 列）只显示小人、状态、占用、速度和命中率。窄屏模式只对终端生效：桌面应用报告的列数和终端算法不同，按同一阈值判断会把内容误藏，所以桌面应用始终显示完整内容。
+In a narrow terminal (band under 96 columns) only the mascot, state, usage, speed and hit rate are shown. Narrow mode applies to the terminal only: the desktop app reports its width differently, and the same threshold would hide content there, so the desktop app always shows everything.
 
-## 计算口径
+## How the numbers are computed
 
-- **输出速度**：输出 token 数 ÷ 生成耗时。生成耗时从收到第一个流片段算起，到流结束为止，不含排队和首字延迟。数值在本机测得，会受网络影响；思考（thinking）token 计入输出。输出少于 20 个 token 或耗时不足 0.3 秒的请求不计入，避免噪声。
-- **缓存命中率**：缓存读取 ÷（未缓存输入 + 缓存写入 + 缓存读取）。会话第一次请求、刚压缩上下文、或缓存过期（默认 5 分钟）后偏低是正常的。
-- 只统计主对话；子代理（subagent）的请求不计入。`/clear` 后累计数据清零。
+- **Output speed**: output tokens ÷ generation time. Generation time runs from the first streamed chunk to the end of the stream, so queueing and time to first token are excluded. It is measured on your machine and affected by the network; thinking tokens count as output. Requests with fewer than 20 output tokens or under 0.3 s are skipped as noise.
+- **Cache hit rate**: cache reads ÷ (uncached input + cache writes + cache reads). It is normally low on a session's first request, right after compaction, or after the cache expires (5 minutes by default).
+- Only the main conversation is counted; subagent requests are not. `/clear` resets the cumulative figures.
 
-## 使用
+## Usage
 
-- `/token-pulse`：显示或隐藏状态带。
-- 首次模型响应之前不显示。
-- 第一轮结束后显示占用、token 数、速度和命中率；趋势条、▲ 变化量和“均”需要至少两个数据点，从第二轮起出现。
+- `/token-pulse` shows or hides the band.
+- Nothing is shown before the first model response.
+- After the first turn you see usage, token counts, speed and hit rate; the trend bar, the ▲ change and the average need at least two data points and appear from the second turn.
 
-## 安装
+## Install
 
-需要 Claude Code 2.1.287 或更高版本。在 Claude Code 的输入框里执行：
+Requires Claude Code 2.1.287 or later. At the Claude Code prompt:
 
 ```
 /plugin install token-pulse --marketplace gKev1n/token-pulse
 ```
 
-按提示输入 `y` 添加插件市场，再选择安装范围。也可以在系统终端里执行：
+Answer `y` to add the marketplace, then pick a scope. Or from a shell:
 
 ```bash
 claude plugin install token-pulse --marketplace gKev1n/token-pulse
 ```
 
-已在运行的会话里执行 `/reload-plugins` 生效。
+In a session that is already running, run `/reload-plugins`.
 
-如果装着 token-weather，请先停用或卸载，否则两条状态带会同时出现。
+If token-weather is installed, disable or uninstall it first, or you will see two bands.
 
-想自己改代码的话，把仓库克隆到本机，改为添加本地文件夹：
+To work on the code, clone the repository and add the local folder instead:
 
 ```bash
 git clone https://github.com/gKev1n/token-pulse.git ~/mods/token-pulse
@@ -83,23 +85,29 @@ claude plugin marketplace add ~/mods/token-pulse
 claude plugin install token-pulse@token-pulse
 ```
 
-之后修改这个文件夹里的文件，执行 `/reload-plugins` 即可生效，无需重装。
+After that, edits to the folder take effect with `/reload-plugins`; no reinstall needed.
 
-## 已知问题
+## Privacy and data
 
-- Windows 终端使用中文字体时，`•` 等字符可能显示成两格宽，颜文字会轻微错位。
+- Makes no network requests, sends no data to any service, and reads or writes no files on disk.
+- Reads only what Claude Code already provides: per-request token usage (input, cache reads, cache writes, output), context window usage, and the local clock (to time generation). The model's streamed output passes through the `turn.step` hook, which forwards it unchanged and only notes when the first chunk arrives; it neither parses nor keeps the content.
+- Figures are kept only in the current session's state (`$.state`), dropped when the session ends, and reset on `/clear`. Nothing is kept across sessions.
 
-## 开发
+## Known issues
+
+- In Windows terminals with a CJK font, characters such as `•` may render two cells wide and shift the kaomoji slightly.
+
+## Development
 
 ```bash
 claude plugin validate .
 claude plugin test .
 ```
 
-- 判断绘制界面要看 `e.surface !== 'terminal'`。终端的元素表里也有 `Svg` 键，只用 `'Svg' in els` 判断会在终端里误画 SVG。
-- 测试里的 `ui.render` 需要测试自己在最底层答一个（见测试文件里的 `engineDraws`）；`session.usage` 的底层答复要包成 `{ value: ... }`。
-- `docs/images/mascot-*.svg` 由 `hooks/icon.ts` 的 `mascotSvg()` 导出。改了小人造型后，需要重新导出这几张图。
+- Decide the drawing surface with `e.surface !== 'terminal'`. The terminal's element table also has an `Svg` key, so checking `'Svg' in els` alone would draw SVG in the terminal.
+- In tests, `ui.render` needs an answer at the bottom of the chain from the test itself (see `engineDraws` in the test file), and the bottom answer for `session.usage` must be wrapped as `{ value: ... }`.
+- The five mascot images in this README are exported from `mascotSvg()` in `hooks/icon.ts`. Re-export them after changing the mascot.
 
-## 许可证
+## License
 
 [Apache-2.0](LICENSE) © 2026 Ge

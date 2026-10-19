@@ -1,6 +1,6 @@
 {
   "name": "token-pulse",
   "owner": { "name": "Ge" },
-  "description": "token-pulse：Claude Code 输入框上方的上下文、速度与缓存命中率状态带",
+  "description": "token-pulse: a Claude Code status band for context usage, output speed and cache hit rate",
   "plugins": [{ "name": "token-pulse", "source": "./" }]
 }
