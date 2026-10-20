@@ -1,6 +1,9 @@
 {
   "name": "token-pulse",
-  "version": "0.2.1",
+  "displayName": "Token Pulse",
+  "version": "0.2.2",
+  "icon": "./.claude-plugin/icon.svg",
+  "keywords": ["context", "tokens", "cache", "speed", "status-bar", "mod"],
   "description": "A status band above the prompt: an energy mascot for context usage, usage trend, model output speed (tok/s) and prompt cache hit rate",
   "author": { "name": "Ge" },
   "license": "Apache-2.0",
