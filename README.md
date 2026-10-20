@@ -93,6 +93,17 @@ After that, edits to the folder take effect with `/reload-plugins`; no reinstall
 - Reads only what Claude Code already provides: per-request token usage (input, cache reads, cache writes, output), context window usage, and the local clock (to time generation). The model's streamed output passes through the `turn.step` hook, which forwards it unchanged and only notes when the first chunk arrives; it neither parses nor keeps the content.
 - Figures are kept only in the current session's state (`$.state`), dropped when the session ends, and reset on `/clear`. Nothing is kept across sessions.
 
+What each hook in `hooks/register.tsx` does:
+
+| Hook | What it does |
+|---|---|
+| `session.start` | Registers the `/token-pulse` command, then passes the event on |
+| `command.run` (only `token-pulse`) | Answers the mod's own `/token-pulse` command by toggling the band; other commands never reach it |
+| `session.end` | On `/clear`, resets the figures; then passes the event on |
+| `turn.step` | Forwards the model's stream unchanged, timing it from the first chunk to the end, and reads the request's token usage. Subagent requests are ignored |
+| `turn.complete` | Reads the context window usage at the end of a main-conversation turn |
+| `ui.render` (only `AbovePrompt`) | Draws the band; when hidden, before the first response, or while a survey is shown, it leaves the area to Claude Code |
+
 ## Known issues
 
 - In Windows terminals with a CJK font, characters such as `•` may render two cells wide and shift the kaomoji slightly.
@@ -110,4 +121,4 @@ claude plugin test .
 
 ## License
 
-[Apache-2.0](LICENSE) © 2026 Ge
+[Apache-2.0](LICENSE) © 2026 gKev1n

@@ -1,6 +1,6 @@
 {
   "name": "token-pulse",
-  "owner": { "name": "Ge" },
+  "owner": { "name": "gKev1n" },
   "description": "token-pulse: a Claude Code status band for context usage, output speed and cache hit rate",
   "plugins": [{ "name": "token-pulse", "source": "./" }]
 }

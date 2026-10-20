@@ -91,6 +91,17 @@ claude plugin install token-pulse@token-pulse
 - 只读取 Claude Code 已经提供的数据：每次模型请求的 token 用量（输入、缓存读取、缓存写入、输出）、上下文窗口占用，以及本机时钟（用来计算生成耗时）。模型的流式输出会经过 `turn.step` 钩子，但只原样传递、记录第一个片段到达的时间，不解析也不保存其中的内容。
 - 统计结果只保存在当前会话的状态里（`$.state`），会话结束即丢弃，`/clear` 时清零。不跨会话保存。
 
+`hooks/register.tsx` 里每个钩子的作用：
+
+| 钩子 | 作用 |
+|---|---|
+| `session.start` | 注册 `/token-pulse` 命令，然后把事件原样往下传 |
+| `command.run`（只匹配 `token-pulse`） | 响应 mod 自己的 `/token-pulse` 命令，切换状态带显示；其他命令不会进到这里 |
+| `session.end` | `/clear` 时把统计清零，然后把事件往下传 |
+| `turn.step` | 把模型的流式输出原样往下传，从第一个片段到结束计时，并读取本次请求的 token 用量；子代理的请求忽略 |
+| `turn.complete` | 主对话每轮结束时读取上下文窗口占用 |
+| `ui.render`（只匹配 `AbovePrompt`） | 画状态带；隐藏时、首次响应前或显示调查问卷时，把这块区域交还给 Claude Code |
+
 ## 已知问题
 
 - Windows 终端使用中文字体时，`•` 等字符可能显示成两格宽，颜文字会轻微错位。
@@ -108,4 +119,4 @@ claude plugin test .
 
 ## 许可证
 
-[Apache-2.0](LICENSE) © 2026 Ge
+[Apache-2.0](LICENSE) © 2026 gKev1n
